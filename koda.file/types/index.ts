@@ -10,6 +10,22 @@ export type DayEntry = {
   dailyTotal: number; // in minutes
 };
 
+/** Grid timecard: one row per task/charge, hours per day (number only). */
+export type TaskRow = {
+  id: string;
+  sat: string;
+  sun: string;
+  mon: string;
+  tue: string;
+  wed: string;
+  thu: string;
+  fri: string;
+  description: string;
+};
+
+export const DAY_KEYS = ["sat", "sun", "mon", "tue", "wed", "thu", "fri"] as const;
+export type DayKey = (typeof DAY_KEYS)[number];
+
 export type WeekData = {
   entries: DayEntry[];
   weeklyTotal: number; // in minutes
@@ -38,4 +54,14 @@ export type StoredSubmission = {
   entries: DayEntry[];
   weeklyTotal: number;
   submittedAt: number;
+  /** Grid timecard data (hours per day, task rows). When set, use this instead of entries for display. */
+  taskRows?: TaskRow[];
+  remarks?: string;
+};
+
+export type EmployerSettings = {
+  companyName: string;
+  timecardTitle: string;
+  defaultCcEmails: string;
+  weekEndingLabel: string;
 };

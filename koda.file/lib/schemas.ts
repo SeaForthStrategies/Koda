@@ -27,5 +27,28 @@ export const submitSchema = z.object({
   weekLabel: z.string(),
 });
 
+const taskRowSchema = z.object({
+  id: z.string(),
+  sat: z.string(),
+  sun: z.string(),
+  mon: z.string(),
+  tue: z.string(),
+  wed: z.string(),
+  thu: z.string(),
+  fri: z.string(),
+  description: z.string().max(500),
+});
+
+export const submitGridSchema = z.object({
+  taskRows: z.array(taskRowSchema),
+  weeklyTotalHours: z.number().min(0),
+  submitterEmail: z.string().email("Valid submitter email required"),
+  submitterName: z.string().min(1, "Name is required"),
+  additionalRecipients: z.array(z.string().email()).max(10, "Max 10 recipients"),
+  weekLabel: z.string(),
+  remarks: z.string().max(500),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type SubmitInput = z.infer<typeof submitSchema>;
+export type SubmitGridInput = z.infer<typeof submitGridSchema>;

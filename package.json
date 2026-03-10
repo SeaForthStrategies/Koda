@@ -19,6 +19,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "next": "15.1.9",
+    "nodemailer": "^6.9.14",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^4.0.1",
@@ -29,7 +30,10 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
     "@types/node": "^22",
+    "@types/nodemailer": "^6.4.15",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

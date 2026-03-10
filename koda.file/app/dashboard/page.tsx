@@ -2,21 +2,22 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, RefreshCw } from "lucide-react";
-import { DayEntry } from "@/types";
+import { LogOut } from "lucide-react";
+import { TaskRow } from "@/types";
 import {
-  buildWeekEntries,
-  calculateDuration,
-  getWeekLabel,
-  getWeekStart,
-  getWeekStartByOffset,
+  buildTaskRows,
+  getWeekEndingFriday,
+  getWeekEndingFridayByOffset,
+  getWeekEndingLabel,
+  getGrandTotalHours,
+  getRowTotalHours,
   formatDateForInput,
   parseDateFromInput,
 } from "@/lib/utils";
 import { getSession, clearSession } from "@/lib/auth";
 import { saveSubmission } from "@/lib/submissions";
-import { TimeRow } from "@/components/TimeRow";
-import { WeeklyTotal } from "@/components/WeeklyTotal";
+import { getPublicEmployerSettings } from "@/lib/employer-settings";
+import { TimecardGrid } from "@/components/TimecardGrid";
 import { SubmitFooter } from "@/components/SubmitFooter";
 import { KodaLogo } from "@/components/KodaLogo";
 import { ToastContainer } from "@/components/Toast";
@@ -32,22 +33,24 @@ type WeekOption = 0 | 1 | 2 | 3 | 4 | "custom";
 export default function DashboardPage() {
   const router = useRouter();
   const [session, setSession] = useState<{ email: string; name: string; role: string } | null>(null);
-  const [entries, setEntries] = useState<DayEntry[]>([]);
+  const [taskRows, setTaskRows] = useState<TaskRow[]>([]);
+  const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [weekOption, setWeekOption] = useState<WeekOption>(0);
   const [customWeekDate, setCustomWeekDate] = useState<string>(() =>
-    formatDateForInput(getWeekStart())
+    formatDateForInput(getWeekEndingFriday())
   );
+  const [employerBranding, setEmployerBranding] = useState({ companyName: "", timecardTitle: "" });
 
-  const weekStart = useMemo(() => {
+  const weekEnding = useMemo(() => {
     if (weekOption === "custom") {
-      return parseDateFromInput(customWeekDate);
+      return getWeekEndingFriday(parseDateFromInput(customWeekDate));
     }
-    return getWeekStartByOffset(-weekOption);
+    return getWeekEndingFridayByOffset(-weekOption);
   }, [weekOption, customWeekDate]);
 
-  const weekLabel = useMemo(() => getWeekLabel(weekStart), [weekStart]);
+  const weekLabel = useMemo(() => getWeekEndingLabel(weekEnding), [weekEnding]);
 
   useEffect(() => {
     const s = getSession();
@@ -60,30 +63,17 @@ export default function DashboardPage() {
       return;
     }
     setSession(s);
-    setEntries(buildWeekEntries());
+    setTaskRows(buildTaskRows(String(getWeekEndingFriday().getTime())));
+    setEmployerBranding(getPublicEmployerSettings());
   }, [router]);
 
+  const weeklyTotalHours = useMemo(() => getGrandTotalHours(taskRows), [taskRows]);
 
-  const processedEntries = useMemo<DayEntry[]>(() => {
-    return entries.map((e) => ({
-      ...e,
-      dailyTotal: e.enabled ? calculateDuration(e.clockIn, e.clockOut) : 0,
-    }));
-  }, [entries]);
-
-  const weeklyTotal = useMemo(
-    () => processedEntries.reduce((sum, e) => sum + e.dailyTotal, 0),
-    [processedEntries]
-  );
-
-  const handleChange = useCallback(
-    (id: string, field: keyof DayEntry, value: string | boolean) => {
-      setEntries((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, [field]: value } : e))
-      );
-    },
-    []
-  );
+  const handleGridChange = useCallback((rowId: string, field: keyof TaskRow, value: string) => {
+    setTaskRows((prev) =>
+      prev.map((r) => (r.id === rowId ? { ...r, [field]: value } : r))
+    );
+  }, []);
 
   const addToast = useCallback((type: "success" | "error", message: string) => {
     const id = Math.random().toString(36).slice(2);
@@ -95,7 +85,8 @@ export default function DashboardPage() {
   }, []);
 
   const handleReset = () => {
-    setEntries(buildWeekEntries(weekStart));
+    setTaskRows(buildTaskRows(String(weekEnding.getTime())));
+    setRemarks("");
     addToast("success", "Timecard reset.");
   };
 
@@ -107,14 +98,15 @@ export default function DashboardPage() {
   const handleSubmit = async (additionalRecipients: string[]) => {
     if (!session) return;
 
-    const missingDesc = processedEntries.filter(
-      (e) => e.enabled && e.dailyTotal > 0 && !e.description.trim()
-    );
+    const rowsWithHours = taskRows.filter((r) => getRowTotalHours(r) > 0);
+    const missingDesc = rowsWithHours.filter((r) => !r.description.trim());
     if (missingDesc.length > 0) {
-      addToast(
-        "error",
-        `Add descriptions for: ${missingDesc.map((e) => e.day).join(", ")}`
-      );
+      addToast("error", "Add a charge number or task description for each row that has hours.");
+      return;
+    }
+
+    if (remarks.length > 500) {
+      addToast("error", "Remarks must be 500 characters or less.");
       return;
     }
 
@@ -124,12 +116,13 @@ export default function DashboardPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          entries: processedEntries,
-          weeklyTotal,
+          taskRows,
+          weeklyTotalHours,
           submitterEmail: session.email,
           submitterName: session.name,
           additionalRecipients,
           weekLabel,
+          remarks,
         }),
       });
 
@@ -143,8 +136,10 @@ export default function DashboardPage() {
         submitterEmail: session.email,
         submitterName: session.name,
         weekLabel,
-        entries: processedEntries,
-        weeklyTotal,
+        entries: [],
+        weeklyTotal: Math.round(weeklyTotalHours * 60),
+        taskRows,
+        remarks,
       });
 
       addToast("success", "Timecard submitted.");
@@ -168,29 +163,34 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-koda-bg">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5">
         <header className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <KodaLogo size="md" />
             <div>
-              <h1 className="text-sm font-semibold text-koda-text">My timecard</h1>
+              <h1 className="text-sm font-semibold text-slate-900 text-koda-text">
+                {employerBranding.timecardTitle.trim() || "Employee timecard"}
+              </h1>
               <div className="flex flex-wrap items-center gap-2 mt-1">
+                <label className="text-xs text-slate-600 text-koda-text-muted whitespace-nowrap">
+                  Time card for week ending (Friday):
+                </label>
                 <select
                   value={weekOption}
                   onChange={(e) => {
                     const v = e.target.value;
                     if (v === "custom") {
                       setWeekOption("custom");
-                      setCustomWeekDate(formatDateForInput(getWeekStart()));
-                      setEntries(buildWeekEntries(getWeekStart()));
+                      setCustomWeekDate(formatDateForInput(getWeekEndingFriday()));
+                      setTaskRows(buildTaskRows(String(getWeekEndingFriday().getTime())));
                     } else {
                       const n = Number(v) as WeekOption;
                       setWeekOption(n);
-                      const start = getWeekStartByOffset(-n);
-                      setEntries(buildWeekEntries(start));
+                      const friday = getWeekEndingFridayByOffset(-n);
+                      setTaskRows(buildTaskRows(String(friday.getTime())));
                     }
                   }}
-                  className="text-xs font-mono text-koda-text-muted bg-slate-50 border border-koda-border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-koda-accent"
+                  className="text-xs font-mono text-slate-700 bg-white border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-koda-accent"
                 >
                   <option value={0}>This week</option>
                   <option value={1}>Last week</option>
@@ -206,65 +206,67 @@ export default function DashboardPage() {
                     onChange={(e) => {
                       const val = e.target.value;
                       setCustomWeekDate(val);
-                      const start = getWeekStart(parseDateFromInput(val));
-                      setEntries(buildWeekEntries(start));
+                      const friday = getWeekEndingFriday(parseDateFromInput(val));
+                      setTaskRows(buildTaskRows(String(friday.getTime())));
                     }}
-                    className="text-xs font-mono text-koda-text bg-white border border-koda-border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-koda-accent"
+                    className="text-xs font-mono text-slate-900 bg-white border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-koda-accent"
                   />
                 )}
-                <span className="text-xs text-koda-text-muted font-mono">{weekLabel}</span>
+                <span className="text-xs text-slate-600 font-mono">{weekLabel}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-koda-text-muted">{session.name}</span>
+            <span className="text-sm text-slate-600 text-koda-text-muted">{session.name}</span>
             <button
               type="button"
               onClick={handleReset}
-              className="px-3 py-2 rounded-lg text-sm text-koda-text-muted hover:bg-slate-100 border border-koda-border transition-colors focus:outline-none focus:ring-2 focus:ring-koda-accent focus:ring-offset-2"
+              className="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 border border-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-koda-accent"
             >
-              Reset
+              Clear form
             </button>
             <button
               type="button"
               onClick={handleLogout}
-              className="px-3 py-2 rounded-lg text-sm text-koda-red hover:bg-red-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              className="px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               <LogOut size={16} />
             </button>
           </div>
         </header>
 
-        <div className="mb-3">
-          <WeeklyTotal
-            entries={processedEntries}
-            weeklyTotal={weeklyTotal}
-            weekLabel={weekLabel}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-4">
+          <div className="px-4 py-3 border-b border-slate-200">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Hours by day (enter number only, e.g. 8)
+            </p>
+            <TimecardGrid taskRows={taskRows} onChange={handleGridChange} />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-4">
+          <label className="block px-4 py-3 border-b border-slate-200 text-sm font-medium text-slate-700">
+            Remarks (limit 500 characters)
+          </label>
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value.slice(0, 500))}
+            placeholder="Optional notes…"
+            rows={3}
+            className="w-full px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 border-0 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-koda-accent rounded-b-2xl resize-y"
           />
         </div>
 
-        <div className="bg-white rounded-2xl border border-koda-border shadow-sm overflow-hidden mb-3">
-          <div className="hidden lg:grid lg:grid-cols-[140px_100px_100px_1fr_80px] lg:gap-3 lg:px-4 lg:py-2 bg-slate-50 border-b border-koda-border text-xs font-medium text-koda-text-muted uppercase tracking-wider">
-            <div>Day</div>
-            <div>In</div>
-            <div>Out</div>
-            <div>Description</div>
-            <div className="text-center">Total</div>
-          </div>
-          {processedEntries.map((entry) => (
-            <TimeRow key={entry.id} entry={entry} onChange={handleChange} />
-          ))}
-        </div>
-
         <SubmitFooter
-          entries={processedEntries}
-          weeklyTotal={weeklyTotal}
+          entries={[]}
+          weeklyTotal={Math.round(weeklyTotalHours * 60)}
           weekLabel={weekLabel}
           submitterEmail={session.email}
           submitterName={session.name}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           simple
+          summaryLabel={weeklyTotalHours > 0 ? `${weeklyTotalHours.toFixed(1)} hours` : undefined}
         />
       </div>
 

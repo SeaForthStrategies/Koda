@@ -1,12 +1,71 @@
 import { NextRequest, NextResponse } from "next/server";
-import { submitSchema } from "@/lib/schemas";
-import { generateEmailHTML } from "@/lib/utils";
+import { submitSchema, submitGridSchema } from "@/lib/schemas";
+import { generateEmailHTML, generateEmailHTMLForGrid } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Validate input
+    // Grid timecard (hours per day, task rows)
+    const gridResult = submitGridSchema.safeParse(body);
+    if (gridResult.success) {
+      const {
+        taskRows,
+        weeklyTotalHours,
+        submitterEmail,
+        submitterName,
+        additionalRecipients,
+        weekLabel,
+        remarks,
+      } = gridResult.data;
+
+      const allRecipients = [
+        submitterEmail,
+        ...additionalRecipients.filter((r) => r !== submitterEmail),
+      ];
+
+      const html = generateEmailHTMLForGrid(
+        taskRows,
+        weeklyTotalHours,
+        submitterName,
+        weekLabel,
+        remarks
+      );
+
+      const smtpHost = process.env.SMTP_HOST;
+      const smtpUser = process.env.SMTP_USER;
+      const smtpPass = process.env.SMTP_PASS;
+      const smtpPort = parseInt(process.env.SMTP_PORT || "587");
+      const fromEmail = process.env.FROM_EMAIL || "noreply@koda.app";
+
+      if (smtpHost && smtpUser && smtpPass) {
+        const nodemailer = await import("nodemailer");
+        const transporter = nodemailer.default.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          auth: { user: smtpUser, pass: smtpPass },
+        });
+        await transporter.sendMail({
+          from: `"Koda Time Tracking" <${fromEmail}>`,
+          to: allRecipients,
+          subject: `⏱ Timecard — ${weekLabel} · ${submitterName}`,
+          html,
+        });
+      } else {
+        console.log("\n📧 [Koda] Grid timecard would be sent to:", allRecipients);
+        console.log("📋 Subject: Timecard —", weekLabel);
+        console.log("📊 Total hours:", weeklyTotalHours.toFixed(1) + "h\n");
+      }
+
+      return NextResponse.json({
+        success: true,
+        recipientCount: allRecipients.length,
+        message: smtpHost && smtpUser && smtpPass ? "Email sent successfully" : "Submission recorded.",
+      });
+    }
+
+    // Legacy: day entries (clock in/out)
     const result = submitSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
@@ -32,7 +91,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build recipient list
     const allRecipients = [
       submitterEmail,
       ...additionalRecipients.filter((r) => r !== submitterEmail),

@@ -15,6 +15,8 @@ interface SubmitFooterProps {
   isSubmitting: boolean;
   /** When true, hide CC recipients (employee simple flow). */
   simple?: boolean;
+  /** When set (e.g. grid timecard), show this instead of "X days". */
+  summaryLabel?: string;
 }
 
 export function SubmitFooter({
@@ -26,6 +28,7 @@ export function SubmitFooter({
   onSubmit,
   isSubmitting,
   simple = false,
+  summaryLabel,
 }: SubmitFooterProps) {
   const [recipientInput, setRecipientInput] = useState("");
   const [recipients, setRecipients] = useState<string[]>([]);
@@ -137,7 +140,7 @@ export function SubmitFooter({
             <span className="text-koda-text-muted font-mono text-xs ml-1">({submitterEmail})</span>
           </p>
           <p className="text-xs text-koda-text-muted mt-0.5">
-            {activeEntries.length} day{activeEntries.length !== 1 ? "s" : ""} · {weekLabel}
+            {summaryLabel ?? `${activeEntries.length} day${activeEntries.length !== 1 ? "s" : ""}`} · {weekLabel}
           </p>
         </div>
         <button

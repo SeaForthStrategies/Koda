@@ -1,4 +1,4 @@
-import type { DayEntry } from "@/types";
+import type { DayEntry, TaskRow } from "@/types";
 import type { StoredSubmission } from "@/types";
 
 const STORAGE_KEY = "koda_submissions";
@@ -21,12 +21,20 @@ export function saveSubmission(payload: {
   weekLabel: string;
   entries: DayEntry[];
   weeklyTotal: number;
+  taskRows?: TaskRow[];
+  remarks?: string;
 }): void {
   const list = getStoredSubmissions();
   const submission: StoredSubmission = {
     id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-    ...payload,
+    submitterEmail: payload.submitterEmail,
+    submitterName: payload.submitterName,
+    weekLabel: payload.weekLabel,
+    entries: payload.entries ?? [],
+    weeklyTotal: payload.weeklyTotal,
     submittedAt: Date.now(),
+    ...(payload.taskRows && { taskRows: payload.taskRows }),
+    ...(payload.remarks != null && payload.remarks !== "" && { remarks: payload.remarks }),
   };
   list.unshift(submission);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));

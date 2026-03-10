@@ -62,10 +62,10 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-koda-border shadow-lg p-8">
-          <h1 className="text-xl font-semibold text-koda-text mb-1">
+          <h1 className="text-xl font-semibold text-slate-900 text-koda-text mb-1">
             Sign in
           </h1>
-          <p className="text-sm text-koda-text-muted mb-6">
+          <p className="text-sm text-slate-600 text-koda-text-muted mb-6">
             Enter your credentials to access your account.
           </p>
 
@@ -105,7 +105,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-koda-text mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-900 text-koda-text mb-1.5">
                 Email
               </label>
               <div className="relative">
@@ -124,7 +124,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-koda-text mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-900 text-koda-text mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -159,7 +159,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 rounded-lg font-medium text-sm text-white bg-koda-accent hover:bg-koda-accent/90 focus:outline-none focus:ring-2 focus:ring-koda-accent focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-2.5 rounded-lg font-medium text-sm text-white bg-teal-700 bg-koda-accent hover:bg-teal-600 hover:bg-koda-accent/90 focus:outline-none focus:ring-2 focus:ring-koda-accent focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
             >
               {isLoading ? (
                 <>
@@ -173,7 +173,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-koda-muted mt-6">
+        <p className="text-center text-xs text-slate-500 text-koda-muted mt-6">
           Secure time tracking for your team
         </p>
       </div>
