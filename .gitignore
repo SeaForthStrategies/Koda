@@ -1,0 +1,7 @@
+# macOS
+._*
+.DS_Store
+
+# Dependencies and build (backup for root)
+node_modules
+.next
