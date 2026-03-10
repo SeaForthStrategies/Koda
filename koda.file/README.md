@@ -21,14 +21,14 @@ A secure, modern weekly time-tracking application built with **Next.js 14**, **T
 
 ```bash
 # 1. Install dependencies
-npm install
+pnpm install
 
 # 2. Configure environment
 cp .env.example .env.local
 # Edit .env.local with your SMTP credentials
 
 # 3. Run development server
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
@@ -86,6 +86,15 @@ The app supports any SMTP provider:
 | Mailgun | smtp.mailgun.org | — |
 
 If SMTP is not configured, submissions are logged to the console in development.
+
+## ▲ Deploy on Vercel
+
+1. Push the repo to GitHub and import the project in [Vercel](https://vercel.com).
+2. **Root Directory:** If the repo root is not this app, set **Root Directory** to `koda.file` in Project Settings.
+3. **Build & install:** Vercel will use `pnpm install` and `pnpm run build` (see `vercel.json`).
+4. **Environment variables** (optional, for email): add in Vercel → Settings → Environment Variables:
+   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `FROM_EMAIL`
+5. Deploy. The app runs without SMTP (submissions are recorded but not emailed unless env vars are set).
 
 ## 🎨 Tech Stack
 

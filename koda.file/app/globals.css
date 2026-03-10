@@ -1,21 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Light theme only */
 :root {
-  --bg: #0a0a0f;
-  --surface: #11111a;
-  --card: #16161f;
-  --border: #1e1e2e;
-  --accent: #7c6af7;
-  --accent-light: #a89df9;
-  --green: #22d67a;
-  --red: #f74f6a;
-  --muted: #4a4a6a;
-  --text: #e8e8f0;
-  --text-muted: #7a7a9a;
+  color-scheme: light;
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #cbd5e1;
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --success: #047857;
+  --error: #b91c1c;
+  --muted: #64748b;
+  --text: #0f172a;
+  --text-muted: #475569;
 }
 
 * {
@@ -24,92 +26,28 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg);
 }
 
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glass card effect */
-.glass {
-  background: rgba(22, 22, 31, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.glass-light {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--surface);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
-}
-
 /* Input time styling */
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) opacity(0.4);
+  opacity: 0.5;
   cursor: pointer;
 }
 input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  filter: invert(1) opacity(0.8);
+  opacity: 0.8;
 }
 
-/* Focus ring */
-.focus-ring:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
 
-/* Row active glow */
-.row-active {
-  box-shadow: 0 0 0 1px rgba(124, 106, 247, 0.3), 0 4px 24px rgba(124, 106, 247, 0.08);
-}
-
-/* Noise texture overlay */
-.noise::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-}
-
-/* Animated gradient border */
-.gradient-border {
-  position: relative;
-}
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(124, 106, 247, 0.5), transparent, rgba(34, 214, 122, 0.3));
-  z-index: -1;
-}
-
-/* Toggle checkbox */
+/* Toggle switch - clean business style */
 .day-toggle {
   appearance: none;
   width: 40px;
@@ -124,20 +62,32 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 .day-toggle::before {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  background: var(--muted);
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: white;
   border-radius: 50%;
-  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
 }
 .day-toggle:checked {
-  background: rgba(124, 106, 247, 0.3);
+  background: var(--accent);
 }
 .day-toggle:checked::before {
   transform: translateX(18px);
-  background: var(--accent-light);
+}
+
+/* Glass card effect (was referenced but not defined) */
+.glass {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Hero title - clear hierarchy */
+.hero-title {
+  color: var(--text) !important;
 }
 
 @layer utilities {

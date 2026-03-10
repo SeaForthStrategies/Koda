@@ -29,3 +29,13 @@ export type EmailPayload = {
   subject: string;
   html: string;
 };
+
+export type StoredSubmission = {
+  id: string;
+  submitterEmail: string;
+  submitterName: string;
+  weekLabel: string;
+  entries: DayEntry[];
+  weeklyTotal: number;
+  submittedAt: number;
+};

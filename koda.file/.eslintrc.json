@@ -1,0 +1,4 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "ignorePatterns": ["Koda/**", ".next/**", "node_modules/**"]
+}

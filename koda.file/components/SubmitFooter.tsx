@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Users, Shield, X, ChevronDown } from "lucide-react";
+import { Send, Users, ChevronDown, X } from "lucide-react";
 import { DayEntry } from "@/types";
 import { parseEmailList } from "@/lib/utils";
 
@@ -13,6 +13,8 @@ interface SubmitFooterProps {
   submitterName: string;
   onSubmit: (additionalRecipients: string[]) => void;
   isSubmitting: boolean;
+  /** When true, hide CC recipients (employee simple flow). */
+  simple?: boolean;
 }
 
 export function SubmitFooter({
@@ -23,16 +25,18 @@ export function SubmitFooter({
   submitterName,
   onSubmit,
   isSubmitting,
+  simple = false,
 }: SubmitFooterProps) {
   const [recipientInput, setRecipientInput] = useState("");
   const [recipients, setRecipients] = useState<string[]>([]);
   const [inputError, setInputError] = useState("");
   const [expanded, setExpanded] = useState(false);
+  const effectiveRecipients = simple ? [] : recipients;
 
   const addRecipients = () => {
     const emails = parseEmailList(recipientInput);
     if (emails.length === 0) {
-      setInputError("No valid email addresses found");
+      setInputError("Enter at least one valid email");
       return;
     }
     const newList = Array.from(new Set([...recipients, ...emails]));
@@ -49,175 +53,119 @@ export function SubmitFooter({
   const hasTimeData = weeklyTotal > 0;
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden"
-      style={{
-        background: "rgba(16,16,25,0.95)",
-        border: "1px solid rgba(30,30,46,0.8)",
-      }}
-    >
-      {/* Collapsible recipients section */}
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <Users size={16} className="text-koda-accent" />
-          <span className="text-sm font-medium text-koda-text">
-            Additional Recipients
-          </span>
-          {recipients.length > 0 && (
-            <span
-              className="text-xs px-2 py-0.5 rounded-full font-mono"
-              style={{ background: "rgba(124,106,247,0.2)", color: "#a89df9" }}
-            >
-              {recipients.length}
+    <div className="bg-white rounded-2xl border border-koda-border shadow-sm overflow-hidden">
+      {/* Additional recipients - collapsible (hidden in simple mode) */}
+      {!simple && (
+        <>
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="w-full flex items-center justify-between px-5 py-3.5 text-left border-b border-koda-border hover:bg-slate-50 transition-colors"
+          >
+            <span className="flex items-center gap-2 text-sm font-medium text-koda-text">
+              <Users size={16} className="text-koda-muted" />
+              CC recipients
+              {recipients.length > 0 && (
+                <span className="text-xs font-normal text-koda-muted">({recipients.length})</span>
+              )}
             </span>
-          )}
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-koda-text-muted transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {expanded && (
-        <div className="px-6 pb-5 border-t border-koda-border/50">
-          <p className="text-xs text-koda-text-muted mt-4 mb-3">
-            Add comma-separated email addresses to CC on the submission.
-          </p>
-
-          <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              placeholder="manager@company.com, hr@company.com"
-              value={recipientInput}
-              onChange={(e) => {
-                setRecipientInput(e.target.value);
-                setInputError("");
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addRecipients();
-                }
-              }}
-              className="flex-1 bg-koda-surface border border-koda-border rounded-lg px-4 py-2.5 text-koda-text text-sm focus:outline-none focus:border-koda-accent placeholder:text-koda-muted"
+            <ChevronDown
+              size={16}
+              className={`text-koda-muted transition-transform ${expanded ? "rotate-180" : ""}`}
             />
-            <button
-              type="button"
-              onClick={addRecipients}
-              className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all"
-              style={{
-                background: "rgba(124,106,247,0.2)",
-                color: "#a89df9",
-                border: "1px solid rgba(124,106,247,0.3)",
-              }}
-            >
-              Add
-            </button>
-          </div>
-
-          {inputError && (
-            <p className="text-xs text-koda-red mb-2">{inputError}</p>
-          )}
-
-          {recipients.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {recipients.map((email) => (
-                <div
-                  key={email}
-                  className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full"
-                  style={{
-                    background: "rgba(34,214,122,0.08)",
-                    border: "1px solid rgba(34,214,122,0.2)",
-                    color: "#22d67a",
+          </button>
+          {expanded && (
+            <div className="px-5 py-4 border-b border-koda-border bg-slate-50/50">
+              <p className="text-xs text-koda-text-muted mb-2">
+                Add email addresses to receive a copy (comma-separated).
+              </p>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="manager@company.com, hr@company.com"
+                  value={recipientInput}
+                  onChange={(e) => {
+                    setRecipientInput(e.target.value);
+                    setInputError("");
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addRecipients();
+                    }
+                  }}
+                  className="flex-1 border border-koda-border rounded-lg px-3 py-2 text-sm text-koda-text placeholder:text-koda-muted focus:outline-none focus:ring-2 focus:ring-koda-accent focus:border-transparent bg-white"
+                />
+                <button
+                  type="button"
+                  onClick={addRecipients}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-koda-accent hover:bg-slate-100 border border-koda-border transition-colors focus:outline-none focus:ring-2 focus:ring-koda-accent focus:ring-offset-2"
                 >
-                  <span className="font-mono">{email}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeRecipient(email)}
-                    className="hover:opacity-70 transition-opacity"
-                  >
-                    <X size={12} />
-                  </button>
+                  Add
+                </button>
+              </div>
+              {inputError && <p className="text-xs text-koda-red mb-2">{inputError}</p>}
+              {recipients.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {recipients.map((email) => (
+                    <span
+                      key={email}
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md bg-white border border-koda-border text-koda-text font-mono"
+                    >
+                      {email}
+                      <button
+                        type="button"
+                        onClick={() => removeRecipient(email)}
+                        className="hover:text-koda-red text-koda-muted"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Submit row */}
-      <div
-        className="px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-        style={{ borderTop: "1px solid rgba(30,30,46,0.8)" }}
-      >
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-sm text-koda-text">
-            <span className="text-koda-text-muted">Submitting as:</span>
-            <span className="font-medium">{submitterName}</span>
-            <span className="font-mono text-xs text-koda-text-muted">
-              ({submitterEmail})
-            </span>
-          </div>
-          <div className="text-xs text-koda-text-muted">
-            {activeEntries.length} active day{activeEntries.length !== 1 ? "s" : ""} ·{" "}
-            {weekLabel}
-          </div>
+      <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p className="text-sm text-koda-text">
+            Submitting as <strong>{submitterName}</strong>
+            <span className="text-koda-text-muted font-mono text-xs ml-1">({submitterEmail})</span>
+          </p>
+          <p className="text-xs text-koda-text-muted mt-0.5">
+            {activeEntries.length} day{activeEntries.length !== 1 ? "s" : ""} · {weekLabel}
+          </p>
         </div>
-
         <button
           type="button"
-          onClick={() => onSubmit(recipients)}
+          onClick={() => onSubmit(effectiveRecipients)}
           disabled={isSubmitting || !hasTimeData}
-          className="flex items-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            background: isSubmitting
-              ? "rgba(124,106,247,0.3)"
-              : "linear-gradient(135deg, #7c6af7, #6b5ce7)",
-            color: "#fff",
-            boxShadow: isSubmitting ? "none" : "0 4px 24px rgba(124,106,247,0.35)",
-          }}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-koda-accent hover:bg-koda-accent/90 focus:outline-none focus:ring-2 focus:ring-koda-accent focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isSubmitting ? (
             <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               Sending...
             </>
           ) : (
             <>
-              <Send size={15} />
-              Submit Timecard
+              <Send size={16} />
+              Submit timecard
             </>
           )}
         </button>
       </div>
 
-      {/* Legal note — fixed, non-editable */}
-      <div
-        className="px-6 py-4 flex gap-3"
-        style={{
-          background: "rgba(247,79,106,0.05)",
-          borderTop: "1px solid rgba(247,79,106,0.15)",
-        }}
-      >
-        <Shield size={14} className="text-koda-red mt-0.5 flex-shrink-0" />
-        <p
-          className="text-xs leading-relaxed select-none pointer-events-none"
-          style={{ color: "rgba(247,79,106,0.7)" }}
-        >
-          <strong style={{ color: "rgba(247,79,106,0.9)" }}>
-            Legal / Accuracy Notice:
-          </strong>{" "}
-          By submitting this timecard, I certify that the hours and descriptions
-          reported herein are accurate, complete, and truthful to the best of my
-          knowledge. I understand that falsification of time records may result
-          in disciplinary action up to and including termination of employment,
-          and may be subject to applicable civil and criminal penalties under
-          federal and state labor laws.
+      {/* Legal notice */}
+      <div className="px-5 py-3 bg-amber-50/80 border-t border-amber-200/80">
+        <p className="text-xs text-amber-900/90 leading-relaxed select-none">
+          <strong>Accuracy certification:</strong> By submitting, I certify that the hours and
+          descriptions are accurate and complete. Falsification may result in disciplinary action
+          and applicable legal penalties.
         </p>
       </div>
     </div>
