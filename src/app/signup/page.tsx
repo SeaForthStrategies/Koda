@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
-import { SignupForm } from "@/components/forms/SignupForm";
 
 export const metadata = {
   title: "Sign up – Koda",
