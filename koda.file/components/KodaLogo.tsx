@@ -13,7 +13,7 @@ export function KodaLogo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   return (
     <div className="inline-flex items-center gap-2">
       <Clock size={s.icon} className="text-koda-accent" />
-      <span className={`${s.text} font-semibold text-koda-text tracking-tight`}>
+      <span className={`${s.text} font-display font-bold text-koda-text tracking-tight`}>
         Koda
       </span>
     </div>

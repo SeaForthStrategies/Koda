@@ -14,7 +14,7 @@ A secure, modern weekly time-tracking application built with **Next.js 14**, **T
 - **Email Submission** — POST `/api/send` generates a clean HTML email via Nodemailer
 - **Multi-recipient** — Add comma-separated CC recipients
 - **Legal Notice** — Non-editable accuracy certification on every submission
-- **Dark Mode** — Full dark-first design with glassmorphism cards
+- **Light theme** — Consistent light UI with glass-style cards
 - **Form Validation** — Zod schemas on all inputs
 
 ## 🚀 Getting Started
@@ -90,11 +90,13 @@ If SMTP is not configured, submissions are logged to the console in development.
 ## ▲ Deploy on Vercel
 
 1. Push the repo to GitHub and import the project in [Vercel](https://vercel.com).
-2. **Root Directory:** If the repo root is not this app, set **Root Directory** to `koda.file` in Project Settings.
-3. **Build & install:** Vercel will use `pnpm install` and `pnpm run build` (see `vercel.json`).
-4. **Environment variables** (optional, for email): add in Vercel → Settings → Environment Variables:
+2. **Root Directory:** Set **Root Directory** to `koda.file` (Project Settings → General). This ensures Vercel uses this app’s `package.json` (Next.js 14) and avoids autoprefixer/nodemailer resolution issues.
+3. **Build & install:** Uses `pnpm install` and `pnpm run build` from `vercel.json`. The repo includes `.npmrc` so pnpm hoists dependencies correctly for the build.
+4. **Environment variables** (optional, for email): Vercel → Settings → Environment Variables:
    - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `FROM_EMAIL`
 5. Deploy. The app runs without SMTP (submissions are recorded but not emailed unless env vars are set).
+
+**Vercel checklist:** Root Directory = `koda.file` | Node ≥18 (from `package.json` engines) | No build-time env required.
 
 ## 🎨 Tech Stack
 

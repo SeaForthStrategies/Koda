@@ -10,18 +10,18 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["'DM Sans'", "system-ui", "sans-serif"],
-        body: ["'Inter'", "system-ui", "sans-serif"],
+        display: ["'Syne'", "system-ui", "sans-serif"],
+        body: ["'DM Sans'", "system-ui", "sans-serif"],
         mono: ["ui-monospace", "monospace"],
       },
       colors: {
         koda: {
-          bg: "#f1f5f9",
+          bg: "#f8fafc",
           surface: "#ffffff",
           card: "#ffffff",
-          border: "#cbd5e1",
-          accent: "#1d4ed8",
-          "accent-light": "#2563eb",
+          border: "#e2e8f0",
+          accent: "#0f766e",
+          "accent-light": "#14b8a6",
           green: "#047857",
           red: "#b91c1c",
           muted: "#64748b",

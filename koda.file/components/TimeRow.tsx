@@ -23,8 +23,8 @@ export function TimeRow({ entry, onChange }: TimeRowProps) {
   return (
     <div className="border-b border-koda-border last:border-b-0">
       {/* Mobile */}
-      <div className="lg:hidden px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="lg:hidden px-4 py-2.5">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -46,7 +46,7 @@ export function TimeRow({ entry, onChange }: TimeRowProps) {
           </span>
         </div>
         {entry.enabled && (
-          <div className="space-y-3 pl-[52px]">
+          <div className="space-y-2 pl-[52px]">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-xs text-koda-text-muted mb-1">Clock in</label>
@@ -85,7 +85,7 @@ export function TimeRow({ entry, onChange }: TimeRowProps) {
 
       {/* Desktop */}
       <div
-        className={`hidden lg:grid lg:grid-cols-[140px_100px_100px_1fr_80px] lg:gap-4 lg:px-5 lg:py-3 lg:items-center ${
+        className={`hidden lg:grid lg:grid-cols-[140px_100px_100px_1fr_80px] lg:gap-3 lg:px-4 lg:py-2 lg:items-center ${
           !entry.enabled ? "opacity-60" : ""
         }`}
       >

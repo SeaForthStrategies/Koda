@@ -1,18 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Light theme only */
+/* Light theme — cooler palette */
 :root {
   color-scheme: light;
-  --bg: #f1f5f9;
+  --bg: #f8fafc;
+  --bg-warm: #fefce8;
   --surface: #ffffff;
   --card: #ffffff;
-  --border: #cbd5e1;
-  --accent: #1d4ed8;
-  --accent-hover: #1e40af;
+  --border: #e2e8f0;
+  --accent: #0f766e;
+  --accent-light: #14b8a6;
+  --accent-hover: #0d9488;
   --success: #047857;
   --error: #b91c1c;
   --muted: #64748b;
@@ -32,7 +34,7 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -78,16 +80,39 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   transform: translateX(18px);
 }
 
-/* Glass card effect (was referenced but not defined) */
+/* Glass card */
 .glass {
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* Hero title - clear hierarchy */
+/* Hero title — gradient accent */
 .hero-title {
-  color: var(--text) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #0f766e 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+}
+
+/* Subtle noise overlay for depth */
+.bg-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Cool button glow on hover */
+.btn-glow {
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.25);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.btn-glow:hover {
+  box-shadow: 0 8px 28px rgba(15, 118, 110, 0.35);
+  transform: translateY(-1px);
 }
 
 @layer utilities {

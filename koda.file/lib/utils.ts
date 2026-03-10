@@ -66,9 +66,37 @@ export function getWeekLabel(weekStart: Date): string {
 }
 
 /**
- * Build initial week entries for the current week.
+ * Get week start (Monday) for an offset: 0 = this week, -1 = last week, etc.
  */
-export function buildWeekEntries(): DayEntry[] {
+export function getWeekStartByOffset(offset: number): Date {
+  const base = getWeekStart();
+  const d = new Date(base);
+  d.setDate(base.getDate() + offset * 7);
+  return d;
+}
+
+/**
+ * Format a Date as YYYY-MM-DD for input[type="date"].
+ */
+export function formatDateForInput(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * Parse YYYY-MM-DD to Date (noon UTC to avoid timezone shifts).
+ */
+export function parseDateFromInput(value: string): Date {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/**
+ * Build initial week entries. All toggles default to off. Optional weekStart for a specific week.
+ */
+export function buildWeekEntries(weekStart?: Date): DayEntry[] {
   const days = [
     { day: "Monday", dayShort: "Mon" },
     { day: "Tuesday", dayShort: "Tue" },
@@ -79,21 +107,21 @@ export function buildWeekEntries(): DayEntry[] {
     { day: "Sunday", dayShort: "Sun" },
   ];
 
-  const weekStart = getWeekStart();
+  const start = weekStart ? getWeekStart(weekStart) : getWeekStart();
 
   return days.map((d, i) => {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
     return {
-      id: `day-${i}`,
+      id: `day-${start.getTime()}-${i}`,
       day: d.day,
       dayShort: d.dayShort,
       date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      enabled: i < 5, // Mon–Fri active by default
-      clockIn: i < 5 ? "09:00" : "",
-      clockOut: i < 5 ? "17:00" : "",
+      enabled: false,
+      clockIn: "",
+      clockOut: "",
       description: "",
-      dailyTotal: i < 5 ? calculateDuration("09:00", "17:00") : 0,
+      dailyTotal: 0,
     };
   });
 }

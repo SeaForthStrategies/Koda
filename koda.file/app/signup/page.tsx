@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Building2, Mail, User, CheckCircle } from "lucide-react";
@@ -12,7 +12,7 @@ const PLANS = [
   { id: "enterprise", name: "Enterprise", price: "Custom" },
 ] as const;
 
-export default function SignupPage() {
+function SignupForm() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get("plan") ?? "team";
   const [company, setCompany] = useState("");
@@ -166,5 +166,19 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-koda-bg">
+          <div className="animate-pulse text-koda-text-muted text-sm">Loading...</div>
+        </div>
+      }
+    >
+      <SignupForm />
+    </Suspense>
   );
 }

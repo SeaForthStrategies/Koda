@@ -9,6 +9,9 @@ import {
   calculateDuration,
   getWeekLabel,
   getWeekStart,
+  getWeekStartByOffset,
+  formatDateForInput,
+  parseDateFromInput,
 } from "@/lib/utils";
 import { getSession, clearSession } from "@/lib/auth";
 import { saveSubmission } from "@/lib/submissions";
@@ -24,14 +27,27 @@ interface ToastItem {
   message: string;
 }
 
+type WeekOption = 0 | 1 | 2 | 3 | 4 | "custom";
+
 export default function DashboardPage() {
   const router = useRouter();
   const [session, setSession] = useState<{ email: string; name: string; role: string } | null>(null);
   const [entries, setEntries] = useState<DayEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [weekOption, setWeekOption] = useState<WeekOption>(0);
+  const [customWeekDate, setCustomWeekDate] = useState<string>(() =>
+    formatDateForInput(getWeekStart())
+  );
 
-  const weekLabel = useMemo(() => getWeekLabel(getWeekStart()), []);
+  const weekStart = useMemo(() => {
+    if (weekOption === "custom") {
+      return parseDateFromInput(customWeekDate);
+    }
+    return getWeekStartByOffset(-weekOption);
+  }, [weekOption, customWeekDate]);
+
+  const weekLabel = useMemo(() => getWeekLabel(weekStart), [weekStart]);
 
   useEffect(() => {
     const s = getSession();
@@ -46,6 +62,7 @@ export default function DashboardPage() {
     setSession(s);
     setEntries(buildWeekEntries());
   }, [router]);
+
 
   const processedEntries = useMemo<DayEntry[]>(() => {
     return entries.map((e) => ({
@@ -78,7 +95,7 @@ export default function DashboardPage() {
   }, []);
 
   const handleReset = () => {
-    setEntries(buildWeekEntries());
+    setEntries(buildWeekEntries(weekStart));
     addToast("success", "Timecard reset.");
   };
 
@@ -151,13 +168,52 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-koda-bg">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+        <header className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <KodaLogo size="md" />
             <div>
               <h1 className="text-sm font-semibold text-koda-text">My timecard</h1>
-              <p className="text-xs text-koda-text-muted font-mono">{weekLabel}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <select
+                  value={weekOption}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "custom") {
+                      setWeekOption("custom");
+                      setCustomWeekDate(formatDateForInput(getWeekStart()));
+                      setEntries(buildWeekEntries(getWeekStart()));
+                    } else {
+                      const n = Number(v) as WeekOption;
+                      setWeekOption(n);
+                      const start = getWeekStartByOffset(-n);
+                      setEntries(buildWeekEntries(start));
+                    }
+                  }}
+                  className="text-xs font-mono text-koda-text-muted bg-slate-50 border border-koda-border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-koda-accent"
+                >
+                  <option value={0}>This week</option>
+                  <option value={1}>Last week</option>
+                  <option value={2}>2 weeks ago</option>
+                  <option value={3}>3 weeks ago</option>
+                  <option value={4}>4 weeks ago</option>
+                  <option value="custom">Custom date…</option>
+                </select>
+                {weekOption === "custom" && (
+                  <input
+                    type="date"
+                    value={customWeekDate}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCustomWeekDate(val);
+                      const start = getWeekStart(parseDateFromInput(val));
+                      setEntries(buildWeekEntries(start));
+                    }}
+                    className="text-xs font-mono text-koda-text bg-white border border-koda-border rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-koda-accent"
+                  />
+                )}
+                <span className="text-xs text-koda-text-muted font-mono">{weekLabel}</span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -179,7 +235,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <div className="mb-5">
+        <div className="mb-3">
           <WeeklyTotal
             entries={processedEntries}
             weeklyTotal={weeklyTotal}
@@ -187,8 +243,8 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="bg-white rounded-2xl border border-koda-border shadow-sm overflow-hidden mb-4">
-          <div className="hidden lg:grid lg:grid-cols-[140px_100px_100px_1fr_80px] lg:gap-4 lg:px-5 lg:py-3 bg-slate-50 border-b border-koda-border text-xs font-medium text-koda-text-muted uppercase tracking-wider">
+        <div className="bg-white rounded-2xl border border-koda-border shadow-sm overflow-hidden mb-3">
+          <div className="hidden lg:grid lg:grid-cols-[140px_100px_100px_1fr_80px] lg:gap-3 lg:px-4 lg:py-2 bg-slate-50 border-b border-koda-border text-xs font-medium text-koda-text-muted uppercase tracking-wider">
             <div>Day</div>
             <div>In</div>
             <div>Out</div>
