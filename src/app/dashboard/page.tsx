@@ -26,13 +26,11 @@ export default async function DashboardPage() {
     .eq("id", session.user.id)
     .maybeSingle();
 
-  if (profile?.role === "employee") {
-    redirect("/employee-dashboard");
-  }
-
   if (profile?.role === "employer") {
     redirect("/employer-dashboard");
   }
 
-  redirect("/login");
+  // Default to employee dashboard for any non-employer user,
+  // including cases where the profile row or role is missing.
+  redirect("/employee-dashboard");
 }

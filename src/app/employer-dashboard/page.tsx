@@ -29,7 +29,7 @@ export default async function EmployerDashboardPage() {
     .maybeSingle();
 
   if (!profile || (profile as { role?: string }).role !== "employer") {
-    redirect("/dashboard");
+    redirect("/employee-dashboard");
   }
 
   const { data: company } = await supabase
@@ -39,7 +39,7 @@ export default async function EmployerDashboardPage() {
     .maybeSingle();
 
   if (!company) {
-    redirect("/dashboard");
+    redirect("/employee-dashboard");
   }
 
   const { data: timeEntries } = await supabase

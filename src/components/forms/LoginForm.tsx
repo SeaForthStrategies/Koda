@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabaseClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,31 +37,31 @@ export function LoginForm() {
 
     setLoading(true);
     try {
-      const supabase = getSupabaseClient();
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: parsed.data.email,
-        password: parsed.data.password,
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed.data),
       });
-      if (authError) {
-        setError(authError.message ?? "Login failed");
+
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok || !json?.ok) {
+        setError(json?.error ?? "Login failed");
         return;
       }
-      router.push("/dashboard");
+
+      const role = json.role as "employee" | "employer" | undefined;
+      if (role === "employer") {
+        router.push("/employer-dashboard");
+      } else {
+        router.push("/employee-dashboard");
+      }
       router.refresh();
     } catch (err) {
       console.error("Login error:", err);
-      if (
-        err instanceof Error &&
-        err.message.includes(
-          "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
-        )
-      ) {
-        setError(
-          "Supabase is not configured on this deployment. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel."
-        );
-      } else {
-        setError("Network error");
-      }
+      setError("Network error");
     } finally {
       setLoading(false);
     }
