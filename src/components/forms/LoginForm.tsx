@@ -49,8 +49,20 @@ export function LoginForm() {
       }
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("Network error");
+    } catch (err) {
+      console.error("Login error:", err);
+      if (
+        err instanceof Error &&
+        err.message.includes(
+          "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
+        )
+      ) {
+        setError(
+          "Supabase is not configured on this deployment. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel."
+        );
+      } else {
+        setError("Network error");
+      }
     } finally {
       setLoading(false);
     }
