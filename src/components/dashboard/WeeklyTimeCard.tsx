@@ -102,7 +102,7 @@ export function WeeklyTimeCard() {
   };
 
   return (
-    <Card className="overflow-hidden border-border/80 shadow-sm">
+    <Card className="glass overflow-hidden border-border/60 shadow-md">
       <CardHeader className="border-b border-border/60 bg-muted/30 px-5 py-4 sm:px-6 sm:py-5">
         <CardTitle className="text-base font-semibold sm:text-lg">Weekly time card</CardTitle>
         <p className="mt-1 text-sm text-muted-foreground">Check days, add hours and details, then submit.</p>

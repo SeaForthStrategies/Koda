@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,6 +59,7 @@ export default function EmployerDashboardClient({
     setError(null);
     setUpdatingId(entryId);
     try {
+      const supabase = getSupabaseClient();
       const { error: updateError } = await supabase
         .from("time_entries")
         .update({ status })
@@ -98,7 +99,7 @@ export default function EmployerDashboardClient({
         )}
       </section>
 
-      <Card className="border-border/80 shadow-sm">
+      <Card className="glass border-border/60 shadow-md">
         <CardHeader>
           <CardTitle>Time entries</CardTitle>
         </CardHeader>

@@ -68,7 +68,7 @@ export function AdminDashboard() {
   });
 
   return (
-    <Card>
+    <Card className="glass border-border/60 shadow-md">
       <CardHeader>
         <CardTitle>Timecards</CardTitle>
         <div className="flex flex-wrap items-end gap-4 pt-2">

@@ -14,7 +14,7 @@ export default async function EmployeeLoginPage() {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background">
-      <header className="border-b border-border/80 bg-card/50 backdrop-blur-sm">
+      <header className="glass-subtle border-b border-border/60">
         <div className="mx-auto flex h-14 min-h-[44px] max-w-6xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
           <Link href="/" className="text-base font-semibold text-foreground sm:text-lg">
             Koda
@@ -28,7 +28,7 @@ export default async function EmployeeLoginPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:py-16">
-        <div className="w-full max-w-[380px] space-y-8 sm:max-w-md">
+        <div className="w-full max-w-[380px] space-y-8 sm:max-w-md animate-fade-in-up">
           <div className="text-center">
             <h1 className="text-xl font-semibold tracking-tight">Sign in as an employee</h1>
             <p className="mt-2 text-sm text-muted-foreground">

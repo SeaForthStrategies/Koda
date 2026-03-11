@@ -22,7 +22,7 @@ export function DashboardHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-border/80 bg-card/80 backdrop-blur-sm">
+    <header className="glass-subtle sticky top-0 z-10 border-b border-border/60">
       <div className="mx-auto flex h-14 min-h-[44px] max-w-2xl items-center justify-between gap-2 px-4 sm:px-6">
         <Link
           href="/dashboard"

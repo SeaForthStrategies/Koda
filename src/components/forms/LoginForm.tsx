@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +38,7 @@ export function LoginForm() {
 
     setLoading(true);
     try {
+      const supabase = getSupabaseClient();
       const { error: authError } = await supabase.auth.signInWithPassword({
         email: parsed.data.email,
         password: parsed.data.password,
@@ -56,7 +57,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="border-border/80 shadow-sm">
+    <Card className="glass border-border/60 shadow-md">
       <CardContent className="p-6 sm:p-8">
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="space-y-2">

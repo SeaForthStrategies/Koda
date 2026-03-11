@@ -22,25 +22,21 @@ export default async function EmployerDashboardPage() {
     redirect("/employer/login");
   }
 
-  console.time("employer-dashboard:profile");
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .maybeSingle();
-  console.timeEnd("employer-dashboard:profile");
 
   if (!profile || (profile as { role?: string }).role !== "employer") {
     redirect("/dashboard");
   }
 
-  console.time("employer-dashboard:company");
   const { data: company } = await supabase
     .from("companies")
     .select("*")
     .eq("owner_id", user.id)
     .maybeSingle();
-  console.timeEnd("employer-dashboard:company");
 
   if (!company) {
     redirect("/dashboard");

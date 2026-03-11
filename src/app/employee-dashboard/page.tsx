@@ -14,17 +14,14 @@ export default async function EmployeeDashboardPage() {
     redirect("/employee/login");
   }
 
-  console.time("employee-dashboard:session");
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  console.timeEnd("employee-dashboard:session");
 
   if (!session || !session.user) {
     redirect("/employee/login");
   }
 
-  console.time("employee-dashboard:queries");
   const [{ data: profile }, { data: timeEntries }] = await Promise.all([
     supabase
       .from("profiles")
@@ -37,7 +34,6 @@ export default async function EmployeeDashboardPage() {
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false }),
   ]);
-  console.timeEnd("employee-dashboard:queries");
 
   return (
     <div className="min-h-[100dvh] bg-background pb-safe">

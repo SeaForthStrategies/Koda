@@ -27,7 +27,7 @@ export function WorkspaceJoinCode() {
   }
 
   return (
-    <Card className="mb-6">
+    <Card className="glass mb-6 border-border/60 shadow-md">
       <CardHeader>
         <CardTitle className="text-base">Team join code</CardTitle>
       </CardHeader>

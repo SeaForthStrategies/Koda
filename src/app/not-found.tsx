@@ -9,7 +9,7 @@ export const metadata = {
 export default function NotFound() {
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background">
-      <header className="border-b border-border/80 bg-card/50 backdrop-blur-sm">
+      <header className="glass-subtle border-b border-border/60">
         <div className="mx-auto flex h-14 min-h-[44px] max-w-6xl items-center px-4 sm:h-16 sm:px-6">
           <Link href="/" className="text-base font-semibold text-foreground sm:text-lg">
             Koda
@@ -17,7 +17,7 @@ export default function NotFound() {
         </div>
       </header>
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        <div className="glass w-full max-w-md rounded-2xl border border-border/60 p-8 text-center shadow-md animate-scale-in">
           <p className="text-5xl font-bold tracking-tight text-muted-foreground/60 sm:text-6xl">404</p>
           <h1 className="mt-4 text-xl font-semibold">Page not found</h1>
           <p className="mt-2 text-sm text-muted-foreground">

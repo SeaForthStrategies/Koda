@@ -8,6 +8,10 @@ const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
 export default defineConfig([
+  // Ignore macOS metadata/temp files (e.g. `._page.tsx`) so they don't break lint/build
+  {
+    ignores: ["**/._*"],
+  },
   ...compat.extends("next/core-web-vitals"),
   ...compat.extends("next/typescript"),
 ]);

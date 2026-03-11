@@ -71,7 +71,7 @@ export function SignupForm() {
   }
 
   return (
-    <Card className="border-border/80 shadow-sm">
+    <Card className="glass border-border/60 shadow-md">
       <CardContent className="p-6 sm:p-8">
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="grid grid-cols-2 gap-4">

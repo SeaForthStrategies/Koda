@@ -41,7 +41,7 @@ export function YourHoursCard() {
   const recent = timecards.slice(0, 14);
 
   return (
-    <Card>
+    <Card className="glass border-border/60 shadow-md">
       <CardHeader>
         <CardTitle className="text-base">Your hours</CardTitle>
       </CardHeader>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +65,7 @@ export default function EmployeeDashboardClient({
       const hours =
         (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60);
 
+      const supabase = getSupabaseClient();
       const { data, error: insertError } = await supabase
         .from("time_entries")
         .insert({
@@ -104,7 +105,7 @@ export default function EmployeeDashboardClient({
         </p>
       </section>
 
-      <Card className="border-border/80 shadow-sm">
+      <Card className="glass border-border/60 shadow-md">
         <CardHeader>
           <CardTitle>Add a new time entry</CardTitle>
         </CardHeader>
@@ -147,7 +148,7 @@ export default function EmployeeDashboardClient({
         </CardContent>
       </Card>
 
-      <Card className="border-border/80 shadow-sm">
+      <Card className="glass border-border/60 shadow-md">
         <CardHeader>
           <CardTitle>Recent entries</CardTitle>
         </CardHeader>

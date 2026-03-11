@@ -9,7 +9,7 @@ export const metadata = {
 export default function PricingPage() {
   return (
     <div className="min-h-[100dvh] bg-background">
-      <header className="border-b border-border/80 bg-card/50 backdrop-blur-sm">
+      <header className="glass-subtle border-b border-border/60">
         <div className="mx-auto flex h-14 min-h-[44px] max-w-6xl items-center justify-between gap-4 px-4 sm:h-16 sm:px-6">
           <Link href="/" className="text-base font-semibold text-foreground sm:text-lg">
             Koda
@@ -37,7 +37,7 @@ export default function PricingPage() {
         </div>
 
         <div className="mx-auto mt-10 grid max-w-4xl gap-6 sm:mt-14 sm:grid-cols-2 sm:gap-8">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <div className="glass rounded-2xl border border-border/60 p-6 shadow-sm transition-all duration-300 hover:shadow-md sm:p-8 animate-fade-in-up">
             <h2 className="text-lg font-semibold">Free</h2>
             <p className="mt-2 text-3xl font-bold tracking-tight">$0</p>
             <p className="mt-1 text-sm text-muted-foreground">per month</p>
@@ -57,7 +57,7 @@ export default function PricingPage() {
             </Button>
           </div>
 
-          <div className="rounded-2xl border-2 border-primary bg-card p-6 shadow-sm sm:p-8">
+          <div className="glass rounded-2xl border-2 border-primary p-6 shadow-sm transition-all duration-300 hover:shadow-md sm:p-8 animate-fade-in-up animate-delay-1">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">Pro</p>
             <h2 className="mt-1 text-lg font-semibold">Pro</h2>
             <p className="mt-2 text-3xl font-bold tracking-tight">$9</p>

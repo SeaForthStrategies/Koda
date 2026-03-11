@@ -8,7 +8,7 @@ export const metadata = {
 export default function ConfirmEmailPage() {
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-[380px] space-y-6 text-center sm:max-w-md">
+      <div className="glass w-full max-w-[380px] space-y-6 rounded-2xl border border-border/60 p-8 text-center shadow-md sm:max-w-md animate-scale-in">
         <h1 className="text-xl font-semibold tracking-tight">
           Confirm your email
         </h1>
